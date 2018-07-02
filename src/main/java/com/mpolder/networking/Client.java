@@ -22,7 +22,7 @@ public class Client {
     public void start(String ip, int port) throws IOException {
         if (client != null && !client.isClosed()) client.close();
         client = new Socket(ip, port);
-        
+
 
         runConnectionEvent(new ClientConnectEvent(this, ConnectionType.CLIENT_SERVER_CONNECT));
         startInThread();
