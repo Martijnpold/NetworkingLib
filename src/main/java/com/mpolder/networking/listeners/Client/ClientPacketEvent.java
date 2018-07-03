@@ -3,6 +3,9 @@ package com.mpolder.networking.listeners.Client;
 import com.mpolder.networking.Client;
 import com.mpolder.networking.objects.PacketType;
 
+/**
+ * Used to indicate a packet being sent or received on the client side with the content attached.
+ */
 public class ClientPacketEvent {
     private Client client;
     private PacketType packetType;

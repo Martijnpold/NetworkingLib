@@ -4,6 +4,9 @@ import com.mpolder.networking.Client;
 import com.mpolder.networking.listeners.Server.ServerConnectionListener;
 import com.mpolder.networking.objects.ConnectionType;
 
+/**
+ * Used to indicate an event occuring on the connection of a client.
+ */
 public class ClientConnectEvent {
     private Client client;
     private ConnectionType connectionType;

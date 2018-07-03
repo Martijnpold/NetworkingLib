@@ -19,6 +19,9 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+/**
+ * Server class to handle packet sending and connections.
+ */
 public class Server {
     private ServerSocket server;
     private List<InetAddress> banned = new ArrayList<>();
@@ -28,6 +31,11 @@ public class Server {
     private Thread connectionThread;
     private int maxStrikes = 10;
 
+    /**
+     * Open server and start all threads.
+     * @param port Port to allow connections to occur on.
+     * @throws IOException Throws exception when a connection with port could not be made.
+     */
     public void open(int port) throws IOException {
         final Server s = this;
 
@@ -92,6 +100,10 @@ public class Server {
         System.out.println("Awaiting connection...");
     }
 
+    /**
+     * Close the server.
+     * @throws IOException Throws exception when server could not be closed.
+     */
     public void close() throws IOException {
         if (server != null && !server.isClosed()) {
             server.close();
@@ -99,13 +111,23 @@ public class Server {
         }
     }
 
+    /**
+     * Send string to all connected clients.
+     * @param line String to send.
+     */
     public void sendAll(String line) {
         for (ClientConnection cc : getClients()) {
             send(cc, line);
         }
     }
 
-    public Boolean send(final ClientConnection cc, String line) {
+    /**
+     * Send string to specific client.
+     * @param cc Client to send the string to.
+     * @param line String to send.
+     * @return Returns if sending was succesful.
+     */
+    public boolean send(final ClientConnection cc, String line) {
         for (ServerConnectionListener l : listeners) {
             ServerPacketEvent spl = new ServerPacketEvent(this, cc, PacketType.SERVER_SEND, line);
             l.serverPacketEvent(spl);
@@ -125,6 +147,12 @@ public class Server {
         }
     }
 
+    /**
+     * Read line from Client inputstream.
+     * @param cc Client to listen to.
+     * @return String sent by client.
+     * @throws IOException Throws IOException when the client disconnects.
+     */
     private String read(ClientConnection cc) throws IOException {
         Socket s = cc.getClient();
         InputStream outToServer = s.getInputStream();
@@ -142,55 +170,44 @@ public class Server {
         return l;
     }
 
-    public String formatMessage(String sender, String message) {
-        Date d = new Date();
-        String hrs = String.format("%02d", d.getHours());
-        String mins = String.format("%02d", d.getMinutes());
-        String time = "[" + hrs + ":" + mins + "]";
-        return time + " " + sender + ": " + message;
-    }
-
-    private void waitms(int millis) {
-        try {
-            Thread.sleep(millis);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public String getAvailableId(String s) {
-        return getAvailableId(s, 0);
-    }
-
-    private String getAvailableId(String s, int id) {
-        String name = s;
-        if (id > 0) name = s + "-" + id;
-        for (ClientConnection cc : getClients()) {
-            if (cc.getId().equals(name)) {
-                return getAvailableId(s, id + 1);
-            }
-        }
-        return name;
-    }
-
+    /**
+     * Get all connected clients.
+     * @return List of all connected clients.
+     */
     public List<ClientConnection> getClients() {
-        return new ArrayList<ClientConnection>(clients);
+        return new ArrayList<>(clients);
     }
 
+    /**
+     * Set max strikes before a client is banned from the server and not allowed to reconnect.
+     * @param maxStrikes Amount of strikes.
+     */
     public void setMaxStrikes(int maxStrikes) {
         this.maxStrikes = maxStrikes;
     }
 
+    /**
+     * Register a listener class to run code on when an event occurs.
+     * @param l Listener class to register.
+     */
     public void addListener(ServerConnectionListener l) {
         listeners.add(l);
     }
 
+    /**
+     * Run a connection event on all registered listeners.
+     * @param l Event to run.
+     */
     private void runConnectionEvent(ServerConnectEvent l) {
         for (ServerConnectionListener l2 : listeners) {
             l2.serverConnectEvent(l);
         }
     }
 
+    /**
+     * Run a packet event on all registered listeners.
+     * @param l Event to run.
+     */
     private void runPacketEvent(ServerPacketEvent l) {
         for (ServerConnectionListener l2 : listeners) {
             l2.serverPacketEvent(l);

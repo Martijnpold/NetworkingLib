@@ -2,6 +2,10 @@ package com.mpolder.networking.objects;
 
 import java.net.Socket;
 
+/**
+ * Data class to store all data related to a single client connection.
+ * Only used server-sided.
+ */
 public class ClientConnection {
     private Socket client;
     private String id;
@@ -28,7 +32,6 @@ public class ClientConnection {
     }
 
     public void strike() {
-        System.out.println("Striked client");
         strikes++;
     }
 

@@ -14,20 +14,31 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Client class to handle packet sending and connections.
+ */
 public class Client {
     private List<ClientConnectionListener> listeners = new ArrayList<>();
     private Socket client;
     private Thread in;
 
+    /**
+     * Connect client to a server.
+     * @param ip IP used to establish a connection with.
+     * @param port Port to establish a connection with.
+     * @throws IOException Throws exception when a connection could not be made.
+     */
     public void start(String ip, int port) throws IOException {
         if (client != null && !client.isClosed()) client.close();
         client = new Socket(ip, port);
-
 
         runConnectionEvent(new ClientConnectEvent(this, ConnectionType.CLIENT_SERVER_CONNECT));
         startInThread();
     }
 
+    /**
+     * Start thread to read input from the server.
+     */
     private void startInThread() {
         final Client fthis = this;
         if (in != null && in.isAlive()) in.interrupt();
@@ -53,6 +64,10 @@ public class Client {
         in.start();
     }
 
+    /**
+     * Send a string of text to the server.
+     * @param l Text to send.
+     */
     public void send(String l) {
         runPacketEvent(new ClientPacketEvent(this, PacketType.CLIENT_SEND, l));
 
@@ -65,16 +80,28 @@ public class Client {
         }
     }
 
+    /**
+     * Register a listener class to run code on when an event occurs.
+     * @param l Listener class to register.
+     */
     public void addListener(ClientConnectionListener l) {
         listeners.add(l);
     }
 
+    /**
+     * Run a connection event on all registered listeners.
+     * @param l Event to run.
+     */
     private void runConnectionEvent(ClientConnectEvent l) {
         for (ClientConnectionListener l2 : listeners) {
             l2.clientConnectEvent(l);
         }
     }
 
+    /**
+     * Run a packet event on all registered listeners.
+     * @param l Event to run.
+     */
     private void runPacketEvent(ClientPacketEvent l) {
         for (ClientConnectionListener l2 : listeners) {
             l2.clientPacketEvent(l);

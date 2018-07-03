@@ -4,6 +4,9 @@ import com.mpolder.networking.Server;
 import com.mpolder.networking.objects.ClientConnection;
 import com.mpolder.networking.objects.PacketType;
 
+/**
+ * Used to indicate a packet being sent or received on the server side with the content attached.
+ */
 public class ServerPacketEvent {
     private Server server;
     private ClientConnection client;
