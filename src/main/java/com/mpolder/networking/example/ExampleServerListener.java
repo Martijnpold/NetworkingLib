@@ -12,7 +12,7 @@ import com.mpolder.networking.objects.PacketType;
 public class ExampleServerListener implements ServerConnectionListener {
     @Override
     public void serverConnectEvent(ServerConnectEvent event) {
-        System.out.println("Client " + event.getType() + " from " + event.getClient().getClient().getInetAddress().getHostAddress());
+        System.out.println("Server " + event.getType() + " from " + event.getClient().getClient().getInetAddress().getHostAddress());
     }
 
     @Override

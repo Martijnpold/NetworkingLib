@@ -49,6 +49,7 @@ public class Server {
                 while (true) {
                     try {
                         Socket socket = server.accept();
+                        System.out.println("Client connected from: " + socket.getInetAddress() + ":" + socket.getPort());
                         ClientConnection cc = new ClientConnection(socket, maxStrikes);
                         if (banned.contains(socket.getInetAddress())) {
                             runConnectionEvent(new ServerConnectEvent(s, cc, ConnectionType.SERVER_CLIENT_BANNED));
@@ -59,7 +60,6 @@ public class Server {
                         access.lock();
                         clients.add(cc);
                         access.unlock();
-                        System.out.println("Client connected from: " + socket.getInetAddress() + ":" + socket.getPort());
 
                         Runnable r = () -> {
                             while (clients.contains(cc)) {
