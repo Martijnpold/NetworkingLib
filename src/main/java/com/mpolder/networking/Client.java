@@ -37,6 +37,19 @@ public class Client {
     }
 
     /**
+     * Close the socket
+     * @return Succesfully closed client.
+     * @throws IOException Thrown if socket is not opened.
+     */
+    public boolean close() throws IOException {
+        if(client != null && !client.isClosed()) {
+            client.close();
+            return true;
+        }
+        return false;
+    }
+
+    /**
      * Start thread to read input from the server.
      */
     private void startInThread() {
