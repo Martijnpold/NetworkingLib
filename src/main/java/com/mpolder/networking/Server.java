@@ -30,6 +30,7 @@ public class Server {
     private Mutex access = new Mutex();
     private Thread connectionThread;
     private int maxStrikes = 10;
+    private boolean noPrintMode = false;
 
     /**
      * Open server and start all threads.
@@ -49,7 +50,7 @@ public class Server {
                 while (true) {
                     try {
                         Socket socket = server.accept();
-                        System.out.println("Client connected from: " + socket.getInetAddress() + ":" + socket.getPort());
+                        if(!noPrintMode) System.out.println("Client connected from: " + socket.getInetAddress() + ":" + socket.getPort());
                         ClientConnection cc = new ClientConnection(socket, maxStrikes);
                         if (banned.contains(socket.getInetAddress())) {
                             runConnectionEvent(new ServerConnectEvent(s, cc, ConnectionType.SERVER_CLIENT_BANNED));
@@ -71,14 +72,14 @@ public class Server {
                                         }
                                     }
                                 } catch (IOException e) {
-                                    System.out.println("Client disconnected: " + socket.getInetAddress() + ":" + socket.getLocalPort());
+                                    if(!noPrintMode) System.out.println("Client disconnected: " + socket.getInetAddress() + ":" + socket.getLocalPort());
                                     runConnectionEvent(new ServerConnectEvent(s, cc, ConnectionType.SERVER_CLIENT_DISCONNECT));
                                     access.lock();
                                     clients.remove(cc);
                                     access.unlock();
                                 }
                                 if (cc.shouldBeBanned()) {
-                                    System.out.println("Client banned due to reaching max strikes: " + cc.getClient().getInetAddress() + ":" + cc.getClient().getPort());
+                                    if(!noPrintMode) System.out.println("Client banned due to reaching max strikes: " + cc.getClient().getInetAddress() + ":" + cc.getClient().getPort());
                                     runConnectionEvent(new ServerConnectEvent(s, cc, ConnectionType.SERVER_CLIENT_BANNED));
                                     banned.add(cc.getClient().getInetAddress());
                                     try {
@@ -97,7 +98,15 @@ public class Server {
             }
         });
         connectionThread.start();
-        System.out.println("Awaiting connection...");
+        if(!noPrintMode) System.out.println("Awaiting connection...");
+    }
+
+    /**
+     * Enable/Disable NoPrint Mode, this will disable any System prints.
+     * @param noPrintMode Enable or Disable NoPrint.
+     */
+    public void setNoPrintMode(boolean noPrintMode) {
+        this.noPrintMode = noPrintMode;
     }
 
     /**
@@ -107,7 +116,7 @@ public class Server {
     public void close() throws IOException {
         if (server != null && !server.isClosed()) {
             server.close();
-            System.out.println("Server closed.");
+            if(!noPrintMode) System.out.println("Server closed.");
         }
     }
 
@@ -141,7 +150,7 @@ public class Server {
         } catch (IOException e) {
             access.lock();
             clients.remove(cc);
-            System.out.println("Client disconnected: " + cc.getClient().getInetAddress() + ":" + cc.getClient().getLocalPort());
+            if(!noPrintMode) System.out.println("Client disconnected: " + cc.getClient().getInetAddress() + ":" + cc.getClient().getLocalPort());
             access.unlock();
             return false;
         }
