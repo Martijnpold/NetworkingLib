@@ -21,6 +21,8 @@ public class Client {
     private List<ClientConnectionListener> listeners = new ArrayList<>();
     private Socket client;
     private Thread in;
+    private String ip;
+    private int port;
 
     /**
      * Connect client to a server.
@@ -30,6 +32,8 @@ public class Client {
      */
     public void start(String ip, int port) throws IOException {
         if (client != null && !client.isClosed()) client.close();
+        this.ip = ip;
+        this.port = port;
         client = new Socket(ip, port);
 
         runConnectionEvent(new ClientConnectEvent(this, ConnectionType.CLIENT_SERVER_CONNECT));
@@ -82,6 +86,12 @@ public class Client {
      * @param l Text to send.
      */
     public void send(String l) {
+        try {
+            if (client == null || client.isClosed() || !client.isConnected()) start(ip, port);
+        } catch(IOException e) {
+            e.printStackTrace();
+        }
+
         runPacketEvent(new ClientPacketEvent(this, PacketType.CLIENT_SEND, l));
 
         try {
